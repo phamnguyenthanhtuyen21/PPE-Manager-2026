@@ -1,0 +1,6 @@
+{
+  "name": "Quản lý cấp phát PPE",
+  "description": "Hệ thống quản lý quy trình đề xuất, duyệt và cấp phát trang thiết bị bảo hộ lao động (PPE) cho các dự án xây dựng.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
