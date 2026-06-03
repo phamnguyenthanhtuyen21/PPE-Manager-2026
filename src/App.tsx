@@ -1211,10 +1211,22 @@ const handleEditDelivery = (delivery: any) => {
   setEditingDeliveryId(delivery.id);
 
   setDelForm({
-    ...delivery
+    ...delivery,
+    items: delivery.items || [{
+      ppe_type: delivery.ppe_type,
+      quantity: delivery.quantity,
+      unit_price: delivery.unit_price || 0,
+      amount: delivery.amount || 0,
+      cost_code: delivery.cost_code || "9.07.02"
+    }]
   });
 
   setActiveTab("deliveries");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 };
   // Workflows - Delete Delivery Note
   const handleDeleteDelivery = async (id: number) => {
