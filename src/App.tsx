@@ -235,7 +235,7 @@ export default function App() {
     unit_price: 0,
     amount: 0
   });
-
+const [editingDeliveryId, setEditingDeliveryId] = useState<number | null>(null);
   // 2. Delivery Form (Direct entry or Request transition)
   const [delForm, setDelForm] = useState({
     delivery_date: getTodayString(),
