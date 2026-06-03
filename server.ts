@@ -1079,24 +1079,22 @@ app.delete("/api/deliveries/:id", (req, res) => {
   try {
     const { id } = req.params;
     
-    // Retrieve delivery first to check if there is an associated request
-    const delivery = db.prepare("SELECT * FROM deliveries WHERE id = ?").get() as any;
+    const delivery = db.prepare("SELECT * FROM deliveries WHERE id = ?").get(id) as any;
     if (!delivery) {
       return res.status(404).json({ error: "Không tìm thấy biên bản giao hàng" });
     }
 
     const runTransaction = db.transaction(() => {
-      // Revert request status if applicable
       if (delivery.request_id) {
-        // If delivery is deleted, set request back to 'Đã duyệt'
         db.prepare("UPDATE requests SET status = 'Đã duyệt' WHERE id = ?").run(delivery.request_id);
       }
       
+      db.prepare("DELETE FROM delivery_details WHERE delivery_id = ?").run(id);
       db.prepare("DELETE FROM deliveries WHERE id = ?").run(id);
     });
 
     runTransaction();
-    res.json({ success: true, message: "Đã xóa biên bản giao hàng và cập nhật liên kết" });
+    res.json({ success: true, message: "Đã xóa biên bản và cập nhật liên kết thành công!" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
