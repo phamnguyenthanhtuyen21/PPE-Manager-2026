@@ -1151,15 +1151,27 @@ const [editingDeliveryId, setEditingDeliveryId] = useState<number | null>(null);
         request_id: linkedRequest ? linkedRequest.id : null
       };
 
-      const response = await fetch("/api/deliveries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+     const url = editingDeliveryId
+  ? `/api/deliveries/${editingDeliveryId}`
+  : "/api/deliveries";
+
+const method = editingDeliveryId
+  ? "PUT"
+  : "POST";
+
+const response = await fetch(url, {
+  method,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+});
 
       if (!response.ok) throw new Error("Ghi nhận biên bản giao hàng thất bại.");
 
-      triggerSuccessMsg(`Đã lưu thành công Biên bản giao nhận ${delForm.delivery_note_no} cho ${delForm.project}!`);
+      triggerSuccessMsg(
+  editingDeliveryId
+    ? "Cập nhật biên bản giao hàng thành công!"
+    : "Tạo biên bản giao hàng thành công!"
+);
       
       // Reset forms and contexts
       setDelForm({
@@ -1183,6 +1195,7 @@ const [editingDeliveryId, setEditingDeliveryId] = useState<number | null>(null);
         items: [{ ppe_type: ppeTypes[0] || "Nón bảo hộ", quantity: 1, unit_price: 0, amount: 0, cost_code: "9.07.02" }]
       });
       setLinkedRequest(null);
+setEditingDeliveryId(null);
 
       // Reset delivery file input manually in UI
       const fileInput = document.getElementById("del-file-input") as HTMLInputElement;
@@ -1194,7 +1207,15 @@ const [editingDeliveryId, setEditingDeliveryId] = useState<number | null>(null);
       alert("Có lỗi: " + err.message);
     }
   };
+const handleEditDelivery = (delivery: any) => {
+  setEditingDeliveryId(delivery.id);
 
+  setDelForm({
+    ...delivery
+  });
+
+  setActiveTab("deliveries");
+};
   // Workflows - Delete Delivery Note
   const handleDeleteDelivery = async (id: number) => {
     if (!confirm("Bạn có chắc chắn muốn xóa biên bản giao hàng này không? Phiếu yêu cầu liên kết (nếu có) sẽ chuyển lại trạng thái 'Đã duyệt'.")) {
@@ -2946,7 +2967,7 @@ const [editingDeliveryId, setEditingDeliveryId] = useState<number | null>(null);
                       className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded text-xs font-bold transition-all shadow-sm cursor-pointer"
                       id="btn-save-delivery"
                     >
-                      Lưu Biên Bản Thực Giao Lên SQLite
+                      {editingDeliveryId ? "Cập nhật Biên Bản Giao Hàng" : "Lưu Biên Bản Thực Giao Lên SQLite"}
                     </button>
                   </div>
 
@@ -3055,6 +3076,12 @@ const [editingDeliveryId, setEditingDeliveryId] = useState<number | null>(null);
                               {del.note || "-"}
                             </td>
                             <td className="p-3 text-right">
+<button
+    onClick={() => handleEditDelivery(del)}
+    className="p-1 px-1.5 text-blue-600 hover:bg-blue-50 rounded transition-all cursor-pointer font-bold border border-transparent hover:border-blue-100 inline-flex items-center gap-1 shrink-0 mr-2"
+  >
+    ✏️ Sửa
+  </button>
                               <button
                                 onClick={() => handleDeleteDelivery(del.id)}
                                 className="p-1 px-1.5 text-rose-600 hover:bg-rose-50 rounded transition-all cursor-pointer font-bold border border-transparent hover:border-rose-100 inline-flex items-center gap-1 shrink-0"
